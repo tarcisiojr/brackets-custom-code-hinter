@@ -1,0 +1,23 @@
+{
+    "name": "tarcisio.custom-code-hinter",
+    "title": "Custom Code Hinter",
+    "description": "Allow devepers add custom code hint at projects.",
+    "homepage": "https://github.com/tarcisiojr/brackets-custom-code-hinter",
+    "version": "0.0.01",
+    "author": "Tarcísio Abadio de Magalhães Júnior <tarcisiojunior@gmail.com>",
+    "license": "MIT",
+    "engines": {
+        "brackets": ">=0.36.0"
+    },
+    "main": "main.js",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/tarcisiojr/brackets-custom-code-hinter.git"
+    },
+    "bugs": {
+        "url": "https://github.com/tarcisiojr/brackets-custom-code-hinter/issues"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    }
+}
