@@ -1,0 +1,19 @@
+{
+    "providers": [
+        {
+            "name": "JSONProvider",
+            "opts": {
+                "implicitChar": ".",
+
+                "match": "",
+
+                "hints": [
+                    {
+                        "label": "funcao a",
+                        "text": "funcao(a)"
+                    }
+                ]
+            }
+        }
+    ]
+}
