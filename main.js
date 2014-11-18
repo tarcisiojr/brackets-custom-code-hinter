@@ -50,7 +50,8 @@ define(function (require, exports, module) {
                         "funcao a",
                         "funcao b",
                         "funcao c",
-                        "funcao d"
+                        "funcao d",
+                        "fyuasd e"
                     ],
                     match: 'a',
                     selectInicial: false,
@@ -63,9 +64,9 @@ define(function (require, exports, module) {
                     return;
                 }
 
-                var cursor = editor.getCursorPos();
+                var cursor = this.editor.getCursorPos();
 
-                //this.editor.
+                this.editor.document.replaceRange(hint, cursor);
             }
 
         }, ["all"], 0);
