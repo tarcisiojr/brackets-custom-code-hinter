@@ -23,6 +23,52 @@ define(function (require, exports, module) {
         CodeHintManager     = brackets.getModule('editor/CodeHintManager');
 
 
+    //var p = require('JSONProvider');
+
+    function initProviders(providers) {
+
+        for (var i = 0; i < providers.length; i++) {
+            try {
+                var provider = require([providers[i].name], function() {
+                    console.log('ola', arguments);
+                });
+            } catch (err) {
+                console.error('Provider not found: ' + err);
+            }
+        }
+
+        console.log(providers);
+    }
+
+    function loadConfigs(rawText) {
+        var config = { providers: [] };
+
+        try {
+            config = JSON.parse(rawText);
+
+            initProviders(config.providers || []);
+        } catch (err) {
+            console.error('Err on load config: ' + err);
+        }
+    }
+
+    function readConfigFile() {
+        var rootPath   = ProjectManager.getProjectRoot().fullPath,
+            cmdCfgFile = FileSystem.getFileForPath(rootPath + 'cch.json');
+
+        FileUtils.readAsText(cmdCfgFile).done(function (rawText) {
+            loadConfigs(rawText);
+        });
+    }
+
+    $(ProjectManager).on('projectOpen projectRefresh', readConfigFile);
+    $(DocumentManager).on('documentSaved', function(evt, doc) {
+        if (doc.file.name == 'cmdrunner.json') {
+            readConfigFile();
+        }
+    });
+
+
     AppInit.appReady(function () {
         CodeHintManager.registerHintProvider({
             hasHints: function(editor, implicitChar) {
@@ -34,7 +80,7 @@ define(function (require, exports, module) {
 
                 var cursor = editor.getCursorPos();
 
-                var lineBeginning = { line: cursor.line, ch: 0};
+                var lineBeginning = { line: cursor.line, ch: 0 };
 
                 var textBeforeCursor = editor.document.getRange(lineBeginning, cursor);
 
