@@ -22,24 +22,34 @@ define(function (require, exports, module) {
         DocumentManager     = brackets.getModule('document/DocumentManager'),
         CodeHintManager     = brackets.getModule('editor/CodeHintManager');
 
+    var providersCache = [];
 
-    //var p = require('JSONProvider');
-
+    /**
+     * Inicia os providers registrados no arquivo cch.json.
+     *
+     * @provider array provider Array com os providers configurados no arquivo cch.json.
+     */
     function initProviders(providers) {
+        // Nome dos providers.
+        var provsNames = providers.map(function(elem) {
+            return elem.name;
+        });
 
-        for (var i = 0; i < providers.length; i++) {
-            try {
-                var provider = require([providers[i].name], function() {
-                    console.log('ola', arguments);
-                });
-            } catch (err) {
-                console.error('Provider not found: ' + err);
-            }
-        }
+        // Carregando, via require, os providers e criando uma instancia de execucao de cada.
+        require(provsNames, function() {
+            Array.prototype.slice.call(arguments, 0).forEach(function(provider, i) {
+                console.log(i, providers[i]);
 
-        console.log(providers);
+                providersCache.push(new provider.create(providers[i].opts || {}));
+            });
+        });
     }
 
+    /**
+     * Carrega as configuracoes a partir do arquivo cch.json.
+     *
+     * @param string rawText Conteudo do arquivo cch.json.
+     */
     function loadConfigs(rawText) {
         var config = { providers: [] };
 
@@ -52,6 +62,9 @@ define(function (require, exports, module) {
         }
     }
 
+    /**
+     * Realiza a leitura do arquivo de configuracao cch.json e inicia o processo de configuracao.
+     */
     function readConfigFile() {
         var rootPath   = ProjectManager.getProjectRoot().fullPath,
             cmdCfgFile = FileSystem.getFileForPath(rootPath + 'cch.json');
@@ -72,9 +85,6 @@ define(function (require, exports, module) {
     AppInit.appReady(function () {
         CodeHintManager.registerHintProvider({
             hasHints: function(editor, implicitChar) {
-                if (implicitChar !== '.') {
-                    return false;
-                }
 
                 this.editor = editor;
 
@@ -82,37 +92,58 @@ define(function (require, exports, module) {
 
                 var lineBeginning = { line: cursor.line, ch: 0 };
 
-                var textBeforeCursor = editor.document.getRange(lineBeginning, cursor);
+                var line = editor.document.getRange(lineBeginning, cursor);
 
-                console.log(textBeforeCursor.match(/casper[\.]*/i));
+                this.line = line;
 
-                return textBeforeCursor.match(/casper[\.]*/i);
+                this.providers = providersCache.filter(function(prov) {
+                    return prov.hasHints && prov.hasHints(line, implicitChar);
+                });
+
+                return this.providers.length > 0;
             },
 
-            getHints: function() {
+            getHints: function(implicitChar) {
+                if (this.providers.length == 0) {
+                    return {};
+                }
+
+                var hints = [];
+
+                var line = this.line;
+
+                this.providers.forEach(function(prov) {
+                    var provHints = prov.getHints(line, implicitChar);
+
+                    hints.concat(provHints.map(function(hint) {
+                        var jqObject = $('<span>' + (hint.label || '') + '</span>');
+
+                        jqObject.data('hint', hint);
+
+                        hints.push(jqObject);
+                    }));
+                });
+
                 return {
-                    hints: [
-                        "aaaa",
-                        "funcao a",
-                        "funcao b",
-                        "funcao c",
-                        "funcao d",
-                        "fyuasd e"
-                    ],
-                    match: 'a',
+                    hints: hints,
+                    match: null,
                     selectInicial: false,
                     handleWideResults: false
                 };
             },
 
-            insertHint: function(hint) {
+            insertHint: function(jqHint) {
                 if (!this.editor) {
                     return;
                 }
 
                 var cursor = this.editor.getCursorPos();
 
-                this.editor.document.replaceRange(hint, cursor);
+                var hint = jqHint.data('hint') || {};
+
+                if (hint.text) {
+                    this.editor.document.replaceRange(hint.text, cursor);
+                }
             }
 
         }, ["all"], 0);

@@ -1,10 +1,23 @@
 define(function (require, exports, module) {
     "use strict";
 
+    function JSONProvider(opts) {
+        this.getHints = function (line, implicitChar) {
+            return [{
+                    label: 'aaa',
+                    text: 'aaa'
+                },
+                {
+                    label: 'aaab',
+                    text: 'aaab'
+                }
+            ];
+        };
 
-    exports.create = function(opts) {
-        console.log('oa');
+        this.hasHints = function (line, implicitChar) {
+            return line.indexOf('casper') != -1;
+        };
+    }
 
-        return opts;
-    };
+    exports.create = JSONProvider;
 });
