@@ -3,15 +3,7 @@ define(function (require, exports, module) {
 
     function JSONProvider(opts) {
         this.getHints = function (line, implicitChar) {
-            return [{
-                    label: 'aaa',
-                    text: 'aaa'
-                },
-                {
-                    label: 'aaab',
-                    text: 'aaab'
-                }
-            ];
+            return opts.hints;
         };
 
         this.hasHints = function (line, implicitChar) {

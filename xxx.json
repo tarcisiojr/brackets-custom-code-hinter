@@ -1,0 +1,39 @@
+{
+    "providers": [
+        {
+            "name": "JSONProvider",
+            "opts": {
+                "implicitChar": ".",
+
+                "match": "",
+
+                "hints": [
+                    {
+                        "label": "funcao a",
+                        "text": "funcao(a)"
+                    },
+                    {
+                        "label": "funcao b",
+                        "text": "funcao(b)"
+                    }
+                ]
+            }
+        },
+
+        {
+            "name": "JSONProvider",
+            "opts": {
+                "implicitChar": ".",
+
+                "match": "",
+
+                "hints": [
+                    {
+                        "label": "funcao a",
+                        "text": "funcao(a)"
+                    }
+                ]
+            }
+        }
+    ]
+}

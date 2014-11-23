@@ -1,34 +1,9 @@
 {
     "providers": [
         {
-            "name": "JSONProvider",
+            "name": "CasperJSProvider",
             "opts": {
-                "implicitChar": ".",
-
-                "match": "",
-
-                "hints": [
-                    {
-                        "label": "funcao a",
-                        "text": "funcao(a)"
-                    }
-                ]
-            }
-        },
-
-        {
-            "name": "JSONProvider",
-            "opts": {
-                "implicitChar": ".",
-
-                "match": "",
-
-                "hints": [
-                    {
-                        "label": "funcao a",
-                        "text": "funcao(a)"
-                    }
-                ]
+                "casperjsPath": "/home/tarcisio/Temp/n1k0-casperjs-4f105a9/"
             }
         }
     ]

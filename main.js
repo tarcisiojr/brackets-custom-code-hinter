@@ -24,14 +24,28 @@ define(function (require, exports, module) {
 
     var providersCache = [];
 
+    var BASE_PROVIDERS = {
+        'JSONProvider': true
+    };
+
     /**
      * Inicia os providers registrados no arquivo cch.json.
      *
      * @provider array provider Array com os providers configurados no arquivo cch.json.
      */
     function initProviders(providers) {
+        var rootPath   = ProjectManager.getProjectRoot().fullPath;
+
         // Nome dos providers.
         var provsNames = providers.map(function(elem) {
+            var name = elem.name;
+
+            if (!BASE_PROVIDERS[name]) {
+                name = FileSystem.getFileForPath(rootPath + name + '.js').fullPath;
+
+                return name;
+            }
+
             return elem.name;
         });
 
@@ -40,7 +54,11 @@ define(function (require, exports, module) {
             Array.prototype.slice.call(arguments, 0).forEach(function(provider, i) {
                 console.log(i, providers[i]);
 
-                providersCache.push(new provider.create(providers[i].opts || {}));
+                try {
+                    providersCache.push(new provider.create(providers[i].opts || {}));
+                } catch (err) {
+                    console.log('Err loading provider: ', err);
+                }
             });
         });
     }
@@ -110,7 +128,11 @@ define(function (require, exports, module) {
 
                 var hints = [];
 
-                var line = this.line;
+                var cursor = this.editor.getCursorPos();
+
+                var lineBeginning = { line: cursor.line, ch: 0 };
+
+                var line = this.editor.document.getRange(lineBeginning, cursor);
 
                 this.providers.forEach(function(prov) {
                     var provHints = prov.getHints(line, implicitChar);
@@ -124,11 +146,20 @@ define(function (require, exports, module) {
                     }));
                 });
 
+                hints.sort(function(jq1, jq2) {
+                    var elem1 = jq1.data('hint'),
+                        elem2 = jq2.data('hint');
+
+                    return elem1.text > elem2.text ? 1 : elem1.text < elem2.text ? -1 : 0;
+                });
+
+                console.log(hints);
+
                 return {
                     hints: hints,
                     match: null,
-                    selectInicial: false,
-                    handleWideResults: false
+                    selectInicial: true,
+                    handleWideResults: true
                 };
             },
 
