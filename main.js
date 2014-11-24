@@ -25,7 +25,8 @@ define(function (require, exports, module) {
     var providersCache = [];
 
     var BASE_PROVIDERS = {
-        'JSONProvider': true
+        'JSONProvider': true,
+        'CasperJSProvider': true
     };
 
     /**
