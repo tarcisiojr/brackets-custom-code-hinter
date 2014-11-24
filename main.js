@@ -178,6 +178,6 @@ define(function (require, exports, module) {
                 }
             }
 
-        }, ["all"], 0);
+        }, ["all"], 2);
     });
 });
