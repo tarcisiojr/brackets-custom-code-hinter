@@ -3,7 +3,7 @@
     "title": "Custom Code Hinter",
     "description": "Allow devepers add custom code hint at projects.",
     "homepage": "https://github.com/tarcisiojr/brackets-custom-code-hinter",
-    "version": "0.0.01",
+    "version": "0.0.1",
     "author": "Tarcísio Abadio de Magalhães Júnior <tarcisiojunior@gmail.com>",
     "license": "MIT",
     "engines": {
