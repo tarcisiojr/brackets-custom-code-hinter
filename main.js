@@ -1,7 +1,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define, $, brackets, window */
 
-// Bracket extension. Permite que o desenvolvedor crie atalhos para os comandos de console.
+// Bracket extension.
 define(function (require, exports, module) {
     "use strict";
 
@@ -47,7 +47,7 @@ define(function (require, exports, module) {
                 return name;
             }
 
-            return elem.name;
+            return 'providers/' + elem.name;
         });
 
         // Carregando, via require, os providers e criando uma instancia de execucao de cada.
@@ -95,7 +95,7 @@ define(function (require, exports, module) {
 
     $(ProjectManager).on('projectOpen projectRefresh', readConfigFile);
     $(DocumentManager).on('documentSaved', function(evt, doc) {
-        if (doc.file.name == 'cmdrunner.json') {
+        if (doc.file.name == 'cch.json') {
             readConfigFile();
         }
     });
@@ -115,9 +115,37 @@ define(function (require, exports, module) {
 
                 this.line = line;
 
-                this.providers = providersCache.filter(function(prov) {
-                    return prov.hasHints && prov.hasHints(line, implicitChar);
+                var indexes = [];
+
+                // Verificando os providers que podem fornecere hints.
+                this.providers = providersCache.filter(function(prov, i) {
+                    if (prov.getRegex && prov.getRegex()) {
+                        var regex = new RegExp(prov.getRegex().source, 'g' + (prov.getRegex().ignoreCase ? 'i' : ''));
+
+                        var match = null,
+                            lastMatch = null;
+
+                        while (match = regex.exec(line)) {
+                            if (match.index == regex.lastIndex) regex.lastIndex++;
+
+                            lastMatch = match;
+                        }
+
+                        if (lastMatch && lastMatch.index >= 0) {
+                            indexes.push({
+                                start:  lastMatch.index,
+                                end:    lastMatch.index + lastMatch[0].length,
+                                match:  lastMatch[0]
+                            });
+                        }
+
+                        return lastMatch && lastMatch.index >= 0;
+                    }
+
+                    return false;
                 });
+
+                this.indexes = indexes;
 
                 return this.providers.length > 0;
             },
@@ -135,13 +163,17 @@ define(function (require, exports, module) {
 
                 var line = this.editor.document.getRange(lineBeginning, cursor);
 
-                this.providers.forEach(function(prov) {
-                    var provHints = prov.getHints(line, implicitChar);
+                var indexes = this.indexes;
+
+                // Obtendo os hints dos providers selecionados.
+                this.providers.forEach(function(prov, i) {
+                    var provHints = prov.getHints(line, indexes[i]);
 
                     hints.concat(provHints.map(function(hint) {
                         var jqObject = $('<span>' + (hint.label || '') + '</span>');
 
                         jqObject.data('hint', hint);
+                        jqObject.data('hintIndex', indexes[i]);
 
                         hints.push(jqObject);
                     }));
@@ -153,8 +185,6 @@ define(function (require, exports, module) {
 
                     return elem1.text > elem2.text ? 1 : elem1.text < elem2.text ? -1 : 0;
                 });
-
-                console.log(hints);
 
                 return {
                     hints: hints,
@@ -169,15 +199,20 @@ define(function (require, exports, module) {
                     return;
                 }
 
-                var cursor = this.editor.getCursorPos();
+                var start = this.editor.getCursorPos();
+                var end   = this.editor.getCursorPos();
 
                 var hint = jqHint.data('hint') || {};
+                var hintIndex = jqHint.data('hintIndex');
+
+                start.ch = hintIndex.end;
 
                 if (hint.text) {
-                    this.editor.document.replaceRange(hint.text, cursor);
+                    // Inserindo o texto do hint.
+                    this.editor.document.replaceRange(hint.text, start, end);
                 }
             }
 
-        }, ["all"], 2);
+        }, [ "all" ], 2);
     });
 });

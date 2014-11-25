@@ -5,6 +5,16 @@
             "opts": {
                 "casperjsPath": "/home/tarcisio/Temp/n1k0-casperjs-4f105a9/"
             }
+        },
+
+        {
+            "name": "JSONProvider",
+            "opts": {
+                "regex": "casper2\\.",
+                "hints": [
+                    {"label": "waitForTarcisio"}
+                ]
+            }
         }
     ]
 }

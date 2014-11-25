@@ -54,21 +54,12 @@ define(function (require, exports, module) {
         return results;
     }
 
-    CasperJSProvider.prototype.hasHints = function (line, implicitChar) {
-        /*if (implicitChar != '.') {
-            return false;
-        }*/
+    CasperJSProvider.prototype.getRegex = function() {
+        return /casper[\.]*/i;
+    };
 
-        var match = line.match(/casper[\.]*/i);
-
-        return match && match[0] && match[0] == 'casper.';
-    }
-
-    CasperJSProvider.prototype.getHints = function (line, implicitChar) {
-
-        var token = line.substr(line.indexOf('casper.') + 7);
-
-        console.log(token);
+    CasperJSProvider.prototype.getHints = function (line, matchInfo) {
+        var token = line.substr(matchInfo.end);
 
         var hint = [];
 
