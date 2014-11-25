@@ -20,4 +20,11 @@ Create a file "cch.json" inside of your project folder. Use cch.json of this pro
 
 The file cch.json is a JSON file that contains the configuration of hinter providers. You can use custom providers already implemented, or create your own.
 
+Providers:
+
+JSONProvider read hints from cch.json file.
+CasperJSProvider parse carperjs.js file looking for functions.
+
+
+
 Custom Code Hinter is released under the [MIT license](http://opensource.org/licenses/MIT).
